@@ -1,0 +1,70 @@
+Create database pizzahut;
+
+create table orders(
+order_id int not null primary key,
+order_date date not null,
+order_time  time not null);
+
+
+
+create table order_deatils(
+order_details_id int not null primary key,
+order_id int not null,
+pizza_id  text not null,
+quantity int not null);
+
+select * from orders;
+
+# Retrieve the total number of orders placed.
+
+SELECT 
+    COUNT(order_id) AS total_orders
+FROM
+    orders;
+
+# Calculate the total revenue generated from pizza sales.  ans :- (quantity * price)
+
+SELECT 
+    ROUND(SUM(order_deatils.quantity * pizzas.price),
+            2) AS total_sales
+FROM
+    order_deatils
+        JOIN
+    pizzas ON pizzas.pizza_id = order_deatils.pizza_id
+
+# Identify the highest-priced pizza
+
+SELECT 
+    pizza_types.name, pizzas.price
+FROM
+    pizza_types
+        JOIN
+    pizzas ON pizza_types.pizza_type_id = pizzas.pizza_type_id
+ORDER BY pizzas.price DESC
+LIMIT 1;
+
+# Identify the most common pizza size ordered.
+
+SELECT 
+    pizzas.size,
+    COUNT(order_deatils.order_details_id) AS order_count
+FROM
+    pizzas
+        JOIN
+    order_deatils ON pizzas.pizza_id = order_deatils.pizza_id
+GROUP BY pizzas.size
+ORDER BY order_count DESC;
+
+# List the top 5 most ordered pizza types along with their quantities.
+
+SELECT 
+    pizza_types.name, SUM(order_deatils.quantity) AS quantity
+FROM
+    pizza_types
+        JOIN
+    pizzas ON pizza_types.pizza_type_id = pizzas.pizza_type_id
+        JOIN
+    order_deatils ON order_deatils.pizza_id = pizzas.pizza_id
+GROUP BY pizza_types.name
+ORDER BY quantity DESC
+LIMIT 5;
